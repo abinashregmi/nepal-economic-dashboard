@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,19 +7,18 @@ from sklearn.linear_model import LinearRegression
 import joblib
 from io import BytesIO
 
-# --- Page Configuration ---
+# Page Configuration
 st.set_page_config(
     page_title="Nepal Economic Resilience Analysis",
     page_icon="🇳🇵",
     layout="wide"
 )
 
-# --- Caching Data Loading and Processing ---
+# 1. Caching Data Loading and Processing
 @st.cache_data
 def load_and_process_data():
     """Loads datasets from CSV files, cleans them, and merges them into a single DataFrame."""
     try:
-        # NOTE: Make sure your CSV files are named exactly like this in your GitHub repo
         tourism_df_raw = pd.read_csv('tourism_revenue.csv.csv', skiprows=4)
         world_bank_df_raw = pd.read_csv('world_bank_data.csv.csv', skiprows=4)
         open_data_nepal_df_raw = pd.read_csv('open_data_nepal.csv.csv', skiprows=4)
@@ -28,7 +26,7 @@ def load_and_process_data():
         st.error("One or more CSV files not found. Please make sure `tourism_revenue.csv.csv`, `world_bank_data.csv.csv`, and `open_data_nepal.csv.csv` are in your GitHub repository.")
         return None
 
-    # --- Data Cleaning and Reshaping ---
+    # Data Cleaning and Reshaping
     def clean_and_reshape(df, column_map, indicator_name_col='Indicator Name'):
         df_clean = df.drop(columns=['Country Name', 'Country Code', 'Indicator Code']).set_index(indicator_name_col).T
         df_clean.index.name = 'Year'
@@ -49,17 +47,17 @@ def load_and_process_data():
     world_bank_df = clean_and_reshape(world_bank_df_raw, world_bank_col_map)
     open_data_nepal_df = clean_and_reshape(open_data_nepal_df_raw, unemployment_col_map)
 
-    # --- Merging DataFrames ---
+    #Merging DataFrames
     merged_df = pd.merge(tourism_df, world_bank_df, on='Year', how='outer')
     merged_df = pd.merge(merged_df, open_data_nepal_df, on='Year', how='outer')
     merged_df = merged_df.sort_values('Year').reset_index(drop=True)
 
-    # --- Data Cleaning and Preprocessing ---
+    # 2. Data Cleaning and Preprocessing
     merged_df.ffill(inplace=True)
     merged_df.bfill(inplace=True)
     merged_df.drop_duplicates(inplace=True)
 
-    # --- Feature Engineering ---
+    #Feature Engineering
     merged_df['Remittance_to_Tourism_Ratio'] = merged_df['Personal Remittances (% of GDP)'] / merged_df['Tourism Revenue (USD mn)']
     merged_df['GDP_Growth_Rate'] = merged_df['GDP (current US$)'].pct_change() * 100
     merged_df.replace([np.inf, -np.inf], np.nan, inplace=True)
@@ -67,7 +65,7 @@ def load_and_process_data():
     
     return merged_df
 
-# --- Train the Model ---
+# Train the Model
 @st.cache_resource
 def train_model(df):
     """Trains a Linear Regression model and returns it."""
@@ -79,7 +77,7 @@ def train_model(df):
     model.fit(X, y)
     return model
 
-# --- Main Application ---
+# Main Application 
 st.title("🇳🇵 Data-Driven Analysis of Nepal's Economic Resilience")
 
 st.markdown("""
@@ -91,7 +89,7 @@ df = load_and_process_data()
 if df is not None:
     model = train_model(df)
 
-    # --- Sidebar for User Input ---
+    # Sidebar for User Input
     st.sidebar.header("🔮 GDP Growth Rate Predictor")
     st.sidebar.markdown("Adjust the sliders to see the model's prediction.")
 
@@ -114,7 +112,7 @@ if df is not None:
         value=float(df['Unemployment Rate'].mean())
     )
 
-    # --- Prediction Logic ---
+    #Prediction Logic
     input_data = pd.DataFrame({
         'Tourism Revenue (USD mn)': [tourism_input],
         'Personal Remittances (% of GDP)': [remittances_input],
@@ -125,7 +123,7 @@ if df is not None:
     st.sidebar.subheader('Predicted GDP Growth Rate:')
     st.sidebar.metric(label="Growth Rate", value=f"{prediction[0]:.2f}%")
 
-    # --- EDA Visualizations ---
+    # 3. EDA Visualizations
     st.markdown("---")
     st.header("📈 Exploratory Data Analysis")
 
@@ -149,14 +147,14 @@ if df is not None:
     sns.regplot(x='Personal Remittances (% of GDP)', y='GDP_Growth_Rate', data=df, ax=ax)
     st.pyplot(fig2)
 
-    # Correlation Heatmap
+    #Correlation Heatmap
     st.subheader('Correlation Matrix of Economic Indicators')
     fig3, ax = plt.subplots(figsize=(12, 10))
     correlation_matrix = df.corr()
     sns.heatmap(correlation_matrix, annot=True, cmap='viridis', fmt=".2f", linewidths=.5, ax=ax)
     st.pyplot(fig3)
 
-    # Display Data
+    # Displays Data
     with st.expander("View the Cleaned and Processed Data"):
         st.dataframe(df)
 

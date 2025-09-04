@@ -15,5 +15,4 @@ The <code>requirements.txt</code> file lists all the necessary libraries.</p><pr
 
 <br class="ProseMirror-trailingBreak"></code></pre></li></ol><h2>▶️ Usage</h2><p>Once the setup is complete, you can run the Streamlit application with a single command:</p><pre><code>streamlit run app.py</pre></code>
 
-<br class="ProseMirror-trailingBreak"></code></pre></li></ol><h2>Remaining of the process you have to open the file for Details :</h2>
-<p><strong>Link:</strong><a href="https://github.com/abinashregmi/nepal-economic-dashboard/blob/main/LastResort_Economic_Analysis.ipynb" title = "null"><strong> https://github.com/abinashregmi/nepal-economic-dashboard/blob/main/LastResort_Economic_Analysis.ipynb</strong>
+<h2>Remaining of the process you have to open the file for Details :</h2><strong>Link:</strong><a href="https://github.com/abinashregmi/nepal-economic-dashboard/blob/main/LastResort_Economic_Analysis.ipynb" title = "null"><strong> https://github.com/abinashregmi/nepal-economic-dashboard/blob/main/LastResort_Economic_Analysis.ipynb</strong>
